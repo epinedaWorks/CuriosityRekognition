@@ -1,0 +1,1221 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+
+<meta charset="UTF-8">
+
+<meta name="viewport"
+content="width=device-width, initial-scale=1.0">
+
+<title>Rekognievent IA</title>
+
+<style>
+
+*{
+    margin:0;
+    padding:0;
+    box-sizing:border-box;
+}
+
+body{
+    font-family:Arial;
+    background:
+    linear-gradient(
+        135deg,
+        #020617,
+        #0f172a,
+        #111827
+    );
+    color:white;
+    overflow:hidden;
+}
+
+header{
+
+    height:70px;
+
+    display:flex;
+
+    align-items:center;
+
+    justify-content:center;
+
+    font-size:28px;
+
+    font-weight:bold;
+
+    background:
+    rgba(255,255,255,0.05);
+
+    border-bottom:
+    1px solid rgba(255,255,255,0.1);
+}
+
+.tabs{
+
+    display:flex;
+
+    gap:10px;
+
+    padding:10px;
+
+    background:#111827;
+}
+
+.tab{
+
+    flex:1;
+
+    padding:14px;
+
+    text-align:center;
+
+    border-radius:12px;
+
+    background:#1e293b;
+
+    cursor:pointer;
+
+    transition:0.3s;
+
+    font-weight:bold;
+}
+
+.tab.active{
+    background:#22c55e;
+}
+
+.main{
+
+    display:flex;
+
+    height:
+    calc(100vh - 130px);
+}
+
+.left{
+
+    width:55%;
+
+    padding:20px;
+
+    display:flex;
+
+    align-items:center;
+
+    justify-content:center;
+}
+
+.right{
+
+    width:45%;
+
+    padding:20px;
+
+    overflow:auto;
+}
+
+.camera-card{
+
+    width:100%;
+
+    max-width:700px;
+
+    background:
+    rgba(255,255,255,0.05);
+
+    border-radius:24px;
+
+    padding:20px;
+
+    transition:0.3s;
+}
+
+.camera-card.success{
+
+    box-shadow:
+    0 0 40px #22c55e;
+}
+
+.camera-card.error{
+
+    box-shadow:
+    0 0 40px #ef4444;
+}
+
+video,
+img{
+
+    width:100%;
+
+    border-radius:18px;
+
+    background:black;
+}
+
+video{
+
+    border:3px solid #22c55e;
+}
+
+#moderationPreview{
+
+    display:none;
+
+    border:3px solid #3b82f6;
+}
+
+.card{
+
+    background:
+    rgba(255,255,255,0.05);
+
+    border-radius:20px;
+
+    padding:20px;
+
+    margin-bottom:20px;
+}
+
+input{
+
+    width:100%;
+
+    padding:14px;
+
+    border:none;
+
+    border-radius:12px;
+
+    margin-top:10px;
+
+    background:#0f172a;
+
+    color:white;
+}
+
+button{
+
+    width:100%;
+
+    padding:14px;
+
+    margin-top:10px;
+
+    border:none;
+
+    border-radius:12px;
+
+    cursor:pointer;
+
+    font-weight:bold;
+
+    transition:0.3s;
+
+    background:#22c55e;
+
+    color:white;
+}
+
+button:hover{
+    transform:scale(1.02);
+}
+
+.warning{
+    background:#f59e0b;
+}
+
+.danger{
+    background:#ef4444;
+}
+
+.result{
+
+    margin-top:15px;
+
+    padding:20px;
+
+    border-radius:18px;
+
+    background:#111827;
+
+    line-height:1.7;
+}
+
+.big-name{
+
+    font-size:40px;
+
+    font-weight:bold;
+
+    color:#22c55e;
+
+    margin-top:10px;
+}
+
+.badge{
+
+    display:inline-block;
+
+    margin-top:10px;
+
+    padding:10px 16px;
+
+    border-radius:999px;
+
+    background:#22c55e;
+
+    font-weight:bold;
+}
+
+.history-item{
+
+    background:#1e293b;
+
+    padding:12px;
+
+    border-radius:12px;
+
+    margin-top:10px;
+}
+
+.emotion{
+
+    display:inline-block;
+
+    margin:5px;
+
+    padding:8px 12px;
+
+    border-radius:999px;
+
+    background:#334155;
+}
+
+.loader{
+    color:#facc15;
+}
+
+.success-text{
+    color:#22c55e;
+}
+
+.error-text{
+    color:#ef4444;
+}
+
+.section{
+    display:none;
+}
+
+.section.active{
+    display:block;
+}
+
+@media(max-width:900px){
+
+    body{
+        overflow:auto;
+    }
+
+    .main{
+        flex-direction:column;
+        height:auto;
+    }
+
+    .left,
+    .right{
+        width:100%;
+    }
+}
+
+</style>
+
+</head>
+
+<body>
+
+<header>
+🎯 Rekognievent IA
+</header>
+
+<div class="tabs">
+
+<div class="tab active"
+onclick="showTab(0)">
+📸 Registro
+</div>
+
+<div class="tab"
+onclick="showTab(1)">
+🤳 Reconocimiento
+</div>
+
+<div class="tab"
+onclick="showTab(2)">
+🛡️ Moderación
+</div>
+
+</div>
+
+<div class="main">
+
+<!-- ====================================== -->
+<!-- LEFT -->
+<!-- ====================================== -->
+
+<div class="left">
+
+<div class="camera-card"
+id="cameraCard">
+
+<video id="video"
+autoplay
+playsinline>
+</video>
+
+<img id="moderationPreview">
+
+<canvas id="canvas"
+style="display:none;">
+</canvas>
+
+</div>
+
+</div>
+
+<!-- ====================================== -->
+<!-- RIGHT -->
+<!-- ====================================== -->
+
+<div class="right">
+
+<!-- ====================================== -->
+<!-- REGISTER -->
+<!-- ====================================== -->
+
+<div class="section active">
+
+<div class="card">
+
+<h2>
+Registro Facial
+</h2>
+
+<input id="name"
+placeholder="Nombre">
+
+<input type="file"
+id="fileRegister"
+accept="image/*">
+
+<button onclick="register()">
+✅ Registrar
+</button>
+
+<div id="statusRegister"></div>
+
+</div>
+
+</div>
+
+<!-- ====================================== -->
+<!-- CHECKIN -->
+<!-- ====================================== -->
+
+<div class="section">
+
+<div class="card">
+
+<h2>
+Reconocimiento
+</h2>
+
+<input type="file"
+id="fileCheckin"
+accept="image/*">
+
+<button onclick="manualCheckin()">
+🔍 Reconocer
+</button>
+
+<button class="warning"
+onclick="toggleAutoCheckin()">
+⏯️ Auto Check-in
+</button>
+
+<button class="danger"
+onclick="resetCollection()">
+🗑️ Reset
+</button>
+
+<div id="statusCheckin"></div>
+
+<div class="result"
+id="resultCheckin">
+
+Esperando reconocimiento...
+
+</div>
+
+</div>
+
+<div class="card">
+
+<h2>
+Últimos accesos
+</h2>
+
+<div id="history"></div>
+
+</div>
+
+</div>
+
+<!-- ====================================== -->
+<!-- MODERATION -->
+<!-- ====================================== -->
+
+<div class="section">
+
+<div class="card">
+
+<h2>
+Moderación IA
+</h2>
+
+<input type="file"
+id="fileUpload"
+accept="image/*"
+onchange="previewModeration()">
+
+<button onclick="upload()">
+🚀 Analizar
+</button>
+
+<div id="statusUpload"></div>
+
+<div class="result"
+id="resultUpload">
+
+Esperando análisis...
+
+</div>
+
+</div>
+
+</div>
+
+</div>
+
+</div>
+
+<script>
+
+const API =
+"https://95abe72lw8.execute-api.us-west-1.amazonaws.com";
+
+let processing = false;
+
+let cooldown = false;
+
+let autoCheckin = true;
+
+let historyList = [];
+
+// ======================================
+// TABS
+// ======================================
+
+function showTab(i){
+
+    document
+    .querySelectorAll('.tab')
+    .forEach((t,idx)=>
+        t.classList.toggle(
+            'active',
+            idx===i
+        )
+    );
+
+    document
+    .querySelectorAll('.section')
+    .forEach((s,idx)=>
+        s.classList.toggle(
+            'active',
+            idx===i
+        )
+    );
+
+    // ==================================
+    // MODERATION VIEW
+    // ==================================
+
+    if(i === 2){
+
+        video.style.display =
+        "none";
+
+        moderationPreview.style.display =
+        "block";
+
+    }else{
+
+        video.style.display =
+        "block";
+
+        moderationPreview.style.display =
+        "none";
+    }
+}
+
+// ======================================
+// CAMERA
+// ======================================
+
+navigator.mediaDevices
+.getUserMedia({
+    video:{
+        facingMode:"user"
+    }
+})
+.then(stream=>{
+
+    video.srcObject = stream;
+});
+
+// ======================================
+// CAPTURE
+// ======================================
+
+function capture(){
+
+    canvas.width =
+    video.videoWidth;
+
+    canvas.height =
+    video.videoHeight;
+
+    canvas
+    .getContext("2d")
+    .drawImage(video,0,0);
+
+    return canvas
+    .toDataURL(
+        "image/jpeg",
+        0.8
+    )
+    .split(',')[1];
+}
+
+// ======================================
+// BASE64
+// ======================================
+
+function toBase64(file){
+
+    return new Promise(res=>{
+
+        const r =
+        new FileReader();
+
+        r.onload = ()=>res(
+            r.result.split(',')[1]
+        );
+
+        r.readAsDataURL(file);
+    });
+}
+
+// ======================================
+// MODERATION PREVIEW
+// ======================================
+
+function previewModeration(){
+
+    const file =
+    fileUpload.files[0];
+
+    if(!file)
+        return;
+
+    const url =
+    URL.createObjectURL(file);
+
+    moderationPreview.src =
+    url;
+
+    moderationPreview.style.display =
+    "block";
+}
+
+// ======================================
+// REGISTER
+// ======================================
+
+async function register(){
+
+    const name =
+    document
+    .getElementById("name")
+    .value;
+
+    if(!name)
+        return alert(
+            "Nombre requerido"
+        );
+
+    let file =
+    fileRegister.files[0];
+
+    let image = file
+        ? await toBase64(file)
+        : capture();
+
+    statusRegister.innerHTML =
+    `<div class="loader">
+        Registrando...
+    </div>`;
+
+    try{
+
+        const res =
+        await fetch(
+            API + "/register",
+        {
+            method:"POST",
+
+            headers:{
+                "Content-Type":
+                "application/json"
+            },
+
+            body:JSON.stringify({
+                name,
+                image
+            })
+        });
+
+        const data =
+        await res.json();
+
+        if(data.success){
+
+            statusRegister.innerHTML = `
+                <div class="success-text">
+                    ✅ ${data.name}
+                    registrado
+                </div>
+            `;
+
+        }else{
+
+            statusRegister.innerHTML = `
+                <div class="error-text">
+                    ⚠️ ${data.message}
+                </div>
+            `;
+        }
+
+    }catch(err){
+
+        console.error(err);
+
+        statusRegister.innerHTML = `
+            <div class="error-text">
+                ❌ Error
+            </div>
+        `;
+    }
+}
+
+// ======================================
+// CHECKIN
+// ======================================
+
+async function processCheckin(image){
+
+    if(processing || cooldown)
+        return;
+
+    processing = true;
+
+    statusCheckin.innerHTML =
+    `<div class="loader">
+        Analizando...
+    </div>`;
+
+    try{
+
+        const res =
+        await fetch(
+            API + "/checkin",
+        {
+            method:"POST",
+
+            headers:{
+                "Content-Type":
+                "application/json"
+            },
+
+            body:JSON.stringify({
+                image
+            })
+        });
+
+        const data =
+        await res.json();
+
+        if(data.match){
+
+            cameraCard.className =
+            "camera-card success";
+
+            setTimeout(()=>{
+
+                cameraCard.className =
+                "camera-card";
+
+            },4000);
+
+            cooldown = true;
+
+            setTimeout(()=>{
+
+                cooldown = false;
+
+            },10000);
+
+            let emotionsHtml = "";
+
+            if(data.emotions){
+
+                emotionsHtml =
+                data.emotions
+                .map(e=>
+
+                    `<div class="emotion">
+                        ${e.type}
+                        (${e.confidence}%)
+                    </div>`
+
+                )
+                .join('');
+            }
+
+            resultCheckin.innerHTML = `
+
+                <h2>
+                    🎉 Bienvenido
+                </h2>
+
+                <div class="big-name">
+                    ${data.name}
+                </div>
+
+                <div class="badge">
+                    ${data.confidence.toFixed(2)}%
+                </div>
+
+                <br><br>
+
+                <h3>
+                    Emociones detectadas
+                </h3>
+
+                ${emotionsHtml}
+            `;
+
+            historyList.unshift({
+                name:data.name,
+                confidence:data.confidence
+            });
+
+            renderHistory();
+
+        }else{
+
+            cameraCard.className =
+            "camera-card error";
+
+            setTimeout(()=>{
+
+                cameraCard.className =
+                "camera-card";
+
+            },3000);
+
+            resultCheckin.innerHTML = `
+                <h2>
+                    🚫 No reconocido
+                </h2>
+            `;
+        }
+
+    }catch(err){
+
+        console.error(err);
+    }
+
+    processing = false;
+}
+
+async function manualCheckin(){
+
+    let file =
+    fileCheckin.files[0];
+
+    let image = file
+        ? await toBase64(file)
+        : capture();
+
+    processCheckin(image);
+}
+
+// ======================================
+// AUTO CHECKIN
+// ======================================
+
+function toggleAutoCheckin(){
+
+    autoCheckin =
+    !autoCheckin;
+
+    alert(
+        autoCheckin
+        ? "Auto ON"
+        : "Auto OFF"
+    );
+}
+
+setInterval(()=>{
+
+    if(!autoCheckin)
+        return;
+
+    const tab =
+    document
+    .querySelectorAll('.section')[1];
+
+    if(
+        !tab.classList
+        .contains('active')
+    ) return;
+
+    processCheckin(
+        capture()
+    );
+
+},3000);
+
+// ======================================
+// HISTORY
+// ======================================
+
+function renderHistory(){
+
+    history.innerHTML = "";
+
+    historyList
+    .slice(0,5)
+    .forEach(item=>{
+
+        history.innerHTML += `
+            <div class="history-item">
+
+                👤 ${item.name}
+
+                <br>
+
+                🎯 ${item.confidence.toFixed(2)}%
+
+            </div>
+        `;
+    });
+}
+
+// ======================================
+// MODERATION
+// ======================================
+
+async function upload(){
+
+    const file =
+    fileUpload.files[0];
+
+    if(!file)
+        return alert(
+            "Selecciona imagen"
+        );
+
+    const image =
+    await toBase64(file);
+
+    statusUpload.innerHTML =
+    `<div class="loader">
+        Analizando...
+    </div>`;
+
+    try{
+
+        const res =
+        await fetch(
+            API + "/upload",
+        {
+            method:"POST",
+
+            headers:{
+                "Content-Type":
+                "application/json"
+            },
+
+            body:JSON.stringify({
+                image
+            })
+        });
+
+        const data =
+        await res.json();
+
+        let html = `
+
+            <h2>
+                ${data.allowed
+                ? "✅ CONTENIDO PERMITIDO"
+                : "❌ CONTENIDO BLOQUEADO"}
+            </h2>
+
+            <br>
+
+            <div class="badge">
+                ${data.allowed
+                ? "RIESGO BAJO"
+                : "RIESGO ALTO"}
+            </div>
+
+            <br><br>
+
+            <b>Interpretación IA:</b>
+
+            <br><br>
+
+            ${data.interpretation
+            ?.join("<br><br>")}
+
+            <br><br>
+
+            <b>Mensaje:</b>
+
+            <br>
+
+            ${data.message}
+        `;
+
+        // ================================
+        // MODERATION LABELS
+        // ================================
+
+        if(data.moderation?.length){
+
+            html += `
+
+                <br><br>
+
+                <h3>
+                    🚨 Categorías detectadas
+                </h3>
+            `;
+
+            data.moderation.forEach(m=>{
+
+                html += `
+
+                    <div class="history-item">
+
+                        <b>${m.name}</b>
+
+                        <br>
+
+                        Categoría:
+                        ${m.parent}
+
+                        <br>
+
+                        Confianza:
+                        ${m.confidence}%
+
+                    </div>
+                `;
+            });
+        }
+
+        // ================================
+        // OBJECTS
+        // ================================
+
+        if(data.detected?.length){
+
+            html += `
+
+                <br><br>
+
+                <h3>
+                    👀 Objetos detectados
+                </h3>
+            `;
+
+            data.detected.forEach(d=>{
+
+                html += `
+
+                    <div class="history-item">
+
+                        ${d.name}
+
+                        <br>
+
+                        ${d.confidence}%
+
+                    </div>
+                `;
+            });
+        }
+
+        // ================================
+        // TEXTS
+        // ================================
+
+        if(data.texts?.length){
+
+            html += `
+
+                <br><br>
+
+                <h3>
+                    📝 Texto detectado
+                </h3>
+            `;
+
+            data.texts.forEach(t=>{
+
+                html += `
+
+                    <div class="history-item">
+
+                        "${t}"
+
+                    </div>
+                `;
+            });
+        }
+
+        // ================================
+        // EMOTIONS
+        // ================================
+
+        if(data.emotions?.length){
+
+            html += `
+
+                <br><br>
+
+                <h3>
+                    😊 Emociones detectadas
+                </h3>
+            `;
+
+            data.emotions.forEach(e=>{
+
+                html += `
+
+                    <div class="emotion">
+
+                        ${e.type}
+
+                        (${e.confidence}%)
+
+                    </div>
+                `;
+            });
+        }
+
+        // ================================
+        // FACES
+        // ================================
+
+        html += `
+
+            <br><br>
+
+            <h3>
+                👤 Rostros detectados
+            </h3>
+
+            ${data.faces_detected}
+        `;
+
+        // ================================
+        // STORAGE
+        // ================================
+
+        if(data.stored_as){
+
+            html += `
+
+                <br><br>
+
+                <h3>
+                    💾 Guardado en S3
+                </h3>
+
+                ${data.stored_as}
+            `;
+        }
+
+        resultUpload.innerHTML =
+        html;
+
+    }catch(err){
+
+        console.error(err);
+    }
+}
+
+// ======================================
+// RESET
+// ======================================
+
+async function resetCollection(){
+
+    if(
+        !confirm(
+            "¿Eliminar todos?"
+        )
+    ) return;
+
+    try{
+
+        const res =
+        await fetch(
+            API + "/reset",
+        {
+            method:"POST"
+        });
+
+        const data =
+        await res.json();
+
+        alert(data.message);
+
+    }catch(err){
+
+        console.error(err);
+    }
+}
+
+</script>
+
+</body>
+
+</html>
